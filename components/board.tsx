@@ -20,11 +20,11 @@ export default function Board() {
 
   return (
     <div>
-      <div className="grid grid-cols-6 pb-10">
+      <div className="grid grid-cols-6 gap-px pb-10">
         {board.map((box, index) => {
           return (
             <div
-              className="w-24 h-24 border-solid border-2 border-gray"
+              className="w-20 h-20 border-2 border-gray text-center text-4xl py-4"
               key={index}
             >
               {box?.hasBalloon ? `🎈` : ""}
