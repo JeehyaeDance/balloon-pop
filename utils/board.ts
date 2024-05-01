@@ -56,3 +56,42 @@ export const generateHighScores = (board: Board, boardSize: number) => {
   highScores.sort((a, b) => b.score - a.score);
   return highScores;
 };
+
+export const isValideMove = (index: number, highScores: HighScores) => {
+  let moveValidity = false;
+  let currentBalloon = highScores.find((square) => square.index === index);
+  if (highScores[0].score === currentBalloon?.score) {
+    moveValidity = true;
+  }
+  return moveValidity;
+};
+
+export const removeAdjacentBalloons = (
+  index: number,
+  board: Board,
+  boardSize: number
+) => {
+  let newBoard = board.slice();
+  newBoard[index].hasBalloon = 0;
+  // remove left square balloon
+  if (index % boardSize !== 0 && board[index - 1].hasBalloon) {
+    newBoard[index - 1].hasBalloon = 0;
+  }
+  // remove check right square balloon
+  if (index % boardSize !== 5 && board[index + 1].hasBalloon) {
+    newBoard[index + 1].hasBalloon = 0;
+  }
+  // remove check top square balloon
+  if (index >= boardSize && board[index - boardSize].hasBalloon) {
+    newBoard[index - boardSize].hasBalloon = 0;
+  }
+  // remove check bottom square balloon
+  if (
+    index < boardSize * (boardSize - 1) &&
+    board[index + boardSize].hasBalloon
+  ) {
+    newBoard[index + boardSize].hasBalloon = 0;
+  }
+
+  return newBoard;
+};
