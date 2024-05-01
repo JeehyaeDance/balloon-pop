@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Provider from "@/components/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,10 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-          Superblock Balloon Pop
-        </h1>
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
