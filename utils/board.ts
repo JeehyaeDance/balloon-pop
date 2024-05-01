@@ -7,6 +7,13 @@ export type HighScores = {
   score: number;
 }[];
 
+export enum GameStatus {
+  WAITING,
+  PLAYING,
+  FAIL,
+  SUCCESS,
+}
+
 export const generateBoard = (boardSize: number) => {
   let board = [];
   // generate board with random ballon placement: 0 (empty) or 1 (balloon)
