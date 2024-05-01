@@ -25,29 +25,39 @@ export const generateBoard = (boardSize: number) => {
 };
 
 export const countScore = (index: number, board: Board, boardSize: number) => {
-  let score = 1;
+  // Initialize visited array to keep track of visited cells
+  const visited = new Array(boardSize * boardSize).fill(false);
 
-  // check left square
-  if (index % boardSize !== 0 && board[index - 1].hasBalloon) {
-    score++;
-  }
-  // check right square
-  if (index % boardSize !== 5 && board[index + 1].hasBalloon) {
-    score++;
-  }
-  // check top square
-  if (index >= boardSize && board[index - boardSize].hasBalloon) {
-    score++;
-  }
-  // check bottom square
-  if (
-    index < boardSize * (boardSize - 1) &&
-    board[index + boardSize].hasBalloon
-  ) {
-    score++;
-  }
+  const getConnectedBalloons = (index: number) => {
+    if (visited[index]) {
+      return 0;
+    }
 
-  return score;
+    visited[index] = true;
+
+    if (!board[index].hasBalloon) {
+      return 0;
+    }
+
+    let count = 1;
+
+    if (index >= boardSize) {
+      count += getConnectedBalloons(index - boardSize); // top
+    }
+    if (index < boardSize * (boardSize - 1)) {
+      count += getConnectedBalloons(index + boardSize); // bottom
+    }
+    if (index % boardSize !== 0) {
+      count += getConnectedBalloons(index - 1); // left
+    }
+    if (index % boardSize !== 5) {
+      count += getConnectedBalloons(index + 1); // right
+    }
+
+    return count;
+  };
+
+  return getConnectedBalloons(index);
 };
 
 export const generateHighScores = (board: Board, boardSize: number) => {
@@ -79,26 +89,36 @@ export const removeAdjacentBalloons = (
   boardSize: number
 ) => {
   let newBoard = board.slice();
-  newBoard[index].hasBalloon = 0;
-  // remove left square balloon
-  if (index % boardSize !== 0 && board[index - 1].hasBalloon) {
-    newBoard[index - 1].hasBalloon = 0;
-  }
-  // remove check right square balloon
-  if (index % boardSize !== 5 && board[index + 1].hasBalloon) {
-    newBoard[index + 1].hasBalloon = 0;
-  }
-  // remove check top square balloon
-  if (index >= boardSize && board[index - boardSize].hasBalloon) {
-    newBoard[index - boardSize].hasBalloon = 0;
-  }
-  // remove check bottom square balloon
-  if (
-    index < boardSize * (boardSize - 1) &&
-    board[index + boardSize].hasBalloon
-  ) {
-    newBoard[index + boardSize].hasBalloon = 0;
-  }
+  const visited = new Array(boardSize * boardSize).fill(false);
+
+  const removeBalloons = (index: number) => {
+    if (visited[index]) {
+      return;
+    }
+
+    visited[index] = true;
+
+    if (!board[index].hasBalloon) {
+      return;
+    }
+
+    newBoard[index].hasBalloon = 0;
+
+    if (index >= boardSize) {
+      removeBalloons(index - boardSize); // top
+    }
+    if (index < boardSize * (boardSize - 1)) {
+      removeBalloons(index + boardSize); // bottom
+    }
+    if (index % boardSize !== 0) {
+      removeBalloons(index - 1); // left
+    }
+    if (index % boardSize !== 5) {
+      removeBalloons(index + 1); // right
+    }
+  };
+
+  removeBalloons(index);
 
   return newBoard;
 };
