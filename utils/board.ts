@@ -50,7 +50,7 @@ export const countScore = (index: number, board: Board, boardSize: number) => {
     if (index % boardSize !== 0) {
       count += getConnectedBalloons(index - 1); // left
     }
-    if (index % boardSize !== 5) {
+    if (index % boardSize !== boardSize - 1) {
       count += getConnectedBalloons(index + 1); // right
     }
 
@@ -113,7 +113,7 @@ export const removeAdjacentBalloons = (
     if (index % boardSize !== 0) {
       removeBalloons(index - 1); // left
     }
-    if (index % boardSize !== 5) {
+    if (index % boardSize !== boardSize - 1) {
       removeBalloons(index + 1); // right
     }
   };
