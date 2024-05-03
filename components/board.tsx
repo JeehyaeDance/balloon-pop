@@ -1,82 +1,45 @@
 "use client";
-import {
-  generateBoard,
-  generateHighScores,
-  removeAdjacentBalloons,
-  isValideMove,
-  GameStatus,
-} from "@/utils/board";
+import { isValideMove, GameStatus } from "@/utils/board";
 import useLocalStorage, { gameInitialState } from "@/utils/useLocalStorage";
 import { useEffect } from "react";
 
 export default function Board() {
-  const [{ gameStatus, board, boardSize, highScores }, setLocalStorage] =
-    useLocalStorage("ballooonGame", gameInitialState);
+  const [{ gameStatus, board, boardSize, highScores }, dispatch] =
+    useLocalStorage(gameInitialState);
 
   useEffect(() => {
     // update highscores, only when the game status is playing
     if (gameStatus === GameStatus.PLAYING) {
-      setLocalStorage({
-        boardSize,
-        board,
-        highScores: generateHighScores(board, boardSize),
-        gameStatus,
-      });
+      dispatch({ type: "UPDATE_HIGH_SCORE" });
     }
   }, [board]);
 
   useEffect(() => {
     // check if highscores is empty, only when the game status is playing
     if (!highScores.length && gameStatus === GameStatus.PLAYING) {
-      setLocalStorage({
-        boardSize,
-        board,
-        highScores,
-        gameStatus: GameStatus.SUCCESS,
-      });
+      dispatch({ type: "END_GAME", gameResult: GameStatus.SUCCESS });
     }
   }, [highScores]);
 
   const startGame = () => {
-    setLocalStorage({
-      boardSize,
-      board: generateBoard(boardSize),
-      highScores,
-      gameStatus: GameStatus.PLAYING,
-    });
+    dispatch({ type: "START_GAME" });
   };
 
   const handleClickSquare = (index: number) => {
     // apply balloon pop logic, when game status is playing and square has balloon
     if (board[index].hasBalloon && gameStatus === GameStatus.PLAYING) {
       if (isValideMove(index, highScores)) {
-        setLocalStorage({
-          boardSize,
-          board: removeAdjacentBalloons(index, board, boardSize),
-          highScores,
-          gameStatus,
-        });
+        dispatch({ type: "POP_BALLOON", index: index });
       } else {
         // invalid game move, game ended
-        setLocalStorage({
-          boardSize,
-          board,
-          highScores,
-          gameStatus: GameStatus.FAIL,
-        });
+        dispatch({ type: "END_GAME", gameResult: GameStatus.FAIL });
       }
     }
   };
 
   const handleBoardSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBoardSize = Number(e.currentTarget.value);
-
-    setLocalStorage({
-      boardSize: newBoardSize,
-      board: new Array(newBoardSize * newBoardSize).fill({ hasBalloon: 0 }),
-      highScores: [],
-      gameStatus: GameStatus.WAITING,
-    });
+    dispatch({ type: "CHAGE_BOARD_SIZE", newBoardSize });
   };
 
   return (
