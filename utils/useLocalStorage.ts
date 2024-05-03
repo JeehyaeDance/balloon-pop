@@ -5,6 +5,7 @@ import {
   HighScores,
   generateBoard,
   generateHighScores,
+  getInitialGameState,
   removeAdjacentBalloons,
 } from "./board";
 
@@ -24,13 +25,6 @@ type ActionType =
   | { type: "UPDATE_HIGH_SCORE" }
   | { type: "GET_SAVED_GAME"; game: GameState }
   | { type: "CHAGE_BOARD_SIZE"; newBoardSize: number };
-
-export const gameInitialState = {
-  boardSize: 6,
-  board: new Array(6 * 6).fill({ hasBalloon: 0 }),
-  highScores: [],
-  gameStatus: GameStatus.WAITING,
-};
 
 const initializer = (initialValue: GameState) => {
   const value = window.localStorage.getItem(localStorageKey);
@@ -69,21 +63,14 @@ function reducer(state: GameState, action: ActionType) {
         ...action.game,
       };
     case "CHAGE_BOARD_SIZE":
-      return {
-        boardSize: action.newBoardSize,
-        board: new Array(action.newBoardSize * action.newBoardSize).fill({
-          hasBalloon: 0,
-        }),
-        highScores: [],
-        gameStatus: GameStatus.WAITING,
-      };
+      return getInitialGameState(action.newBoardSize);
     default:
-      return gameInitialState;
+      return getInitialGameState(6);
   }
 }
 
 export default function useLocalStorage(
-  initialValue: GameState = gameInitialState
+  initialValue: GameState = getInitialGameState(6)
 ) {
   const [gameState, dispatch] = useReducer(reducer, initialValue, initializer);
 

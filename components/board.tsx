@@ -1,11 +1,11 @@
 "use client";
 import { isValideMove, GameStatus } from "@/utils/board";
-import useLocalStorage, { gameInitialState } from "@/utils/useLocalStorage";
+import useLocalStorage from "@/utils/useLocalStorage";
 import { useEffect } from "react";
 
 export default function Board() {
   const [{ gameStatus, board, boardSize, highScores }, dispatch] =
-    useLocalStorage(gameInitialState);
+    useLocalStorage();
 
   useEffect(() => {
     // update highscores, only when the game status is playing
@@ -20,10 +20,6 @@ export default function Board() {
       dispatch({ type: "END_GAME", gameResult: GameStatus.SUCCESS });
     }
   }, [highScores]);
-
-  const startGame = () => {
-    dispatch({ type: "START_GAME" });
-  };
 
   const handleClickSquare = (index: number) => {
     // apply balloon pop logic, when game status is playing and square has balloon
@@ -67,23 +63,23 @@ export default function Board() {
         })}
       </div>
       <div className="flex w-96 items-center">
-        <label className="basis-1/4" htmlFor="boardSize">
-          Board Size:
-        </label>
-        <input
-          className="basis-1/8 border-solid border-2 border-black-600 h-8 pl-4"
-          id="boardSize"
-          type="number"
-          name="boardSize"
-          value={boardSize}
-          min="2"
-          max="12"
-          onChange={handleBoardSizeChange}
-        />
+        <div className="basis-1/2">
+          <label htmlFor="boardSize">Board Size:</label>
+          <input
+            className="border-solid border-2 border-black-600 h-8 pl-4"
+            id="boardSize"
+            type="number"
+            name="boardSize"
+            value={boardSize}
+            min="2"
+            max="12"
+            onChange={handleBoardSizeChange}
+          />
+        </div>
         <button
           className="basis-1/2 w-32 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded"
-          onClick={startGame}
-          type="submit"
+          onClick={() => dispatch({ type: "START_GAME" })}
+          type="button"
         >
           {gameStatus === GameStatus.WAITING ? "Start" : "Restart"}
         </button>

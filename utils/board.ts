@@ -14,6 +14,14 @@ export enum GameStatus {
   SUCCESS,
 }
 
+export const getInitialGameState = (boardSize: number) => {
+  return {
+    boardSize,
+    board: new Array(boardSize * boardSize).fill({ hasBalloon: 0 }),
+    highScores: [],
+    gameStatus: GameStatus.WAITING,
+  };
+};
 export const generateBoard = (boardSize: number) => {
   let board = [];
   // generate board with random ballon placement: 0 (empty) or 1 (balloon)
