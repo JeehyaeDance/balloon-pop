@@ -1,58 +1,82 @@
 "use client";
 import {
-  Board,
-  HighScores,
   generateBoard,
   generateHighScores,
   removeAdjacentBalloons,
   isValideMove,
   GameStatus,
 } from "@/utils/board";
-import { useEffect, useState } from "react";
+import useLocalStorage, { gameInitialState } from "@/utils/useLocalStorage";
+import { useEffect } from "react";
 
 export default function Board() {
-  const [boardSize, setBoardSize] = useState(6);
-  const [board, setBoard] = useState<Board>(
-    new Array(boardSize * boardSize).fill({ hasBalloon: 0 })
-  );
-  const [highScores, setHighScores] = useState<HighScores>([]);
-  const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.WAITING);
+  const [{ gameStatus, board, boardSize, highScores }, setLocalStorage] =
+    useLocalStorage("ballooonGame", gameInitialState);
 
   useEffect(() => {
     // update highscores, only when the game status is playing
     if (gameStatus === GameStatus.PLAYING) {
-      setHighScores(generateHighScores(board, boardSize));
+      setLocalStorage({
+        boardSize,
+        board,
+        highScores: generateHighScores(board, boardSize),
+        gameStatus,
+      });
     }
   }, [board]);
 
   useEffect(() => {
     // check if highscores is empty, only when the game status is playing
     if (!highScores.length && gameStatus === GameStatus.PLAYING) {
-      setGameStatus(GameStatus.SUCCESS);
+      setLocalStorage({
+        boardSize,
+        board,
+        highScores,
+        gameStatus: GameStatus.SUCCESS,
+      });
     }
   }, [highScores]);
 
   const startGame = () => {
-    setBoard(generateBoard(boardSize));
-    setGameStatus(GameStatus.PLAYING);
+    setLocalStorage({
+      boardSize,
+      board: generateBoard(boardSize),
+      highScores,
+      gameStatus: GameStatus.PLAYING,
+    });
   };
 
   const handleClickSquare = (index: number) => {
     // apply balloon pop logic, when game status is playing and square has balloon
     if (board[index].hasBalloon && gameStatus === GameStatus.PLAYING) {
       if (isValideMove(index, highScores)) {
-        setBoard(removeAdjacentBalloons(index, board, boardSize));
+        setLocalStorage({
+          boardSize,
+          board: removeAdjacentBalloons(index, board, boardSize),
+          highScores,
+          gameStatus,
+        });
       } else {
         // invalid game move, game ended
-        setGameStatus(GameStatus.FAIL);
+        setLocalStorage({
+          boardSize,
+          board,
+          highScores,
+          gameStatus: GameStatus.FAIL,
+        });
       }
     }
   };
 
   const handleBoardSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBoardSize = Number(e.currentTarget.value);
-    setBoardSize(newBoardSize);
-    setBoard(new Array(newBoardSize * newBoardSize).fill({ hasBalloon: 0 }));
+
+    setLocalStorage({
+      boardSize: newBoardSize,
+      board: new Array(newBoardSize * newBoardSize).fill({ hasBalloon: 0 }),
+      highScores: [],
+      gameStatus: GameStatus.WAITING,
+    });
   };
 
   return (
