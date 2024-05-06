@@ -14,6 +14,8 @@ export default function Board() {
     handleBoardSizeChange,
   ] = useBoard();
 
+  // To resolve hydration problem
+  // gameState is different between initial state(server) and client state from local storage
   useEffect(() => {
     setMounted(true);
   }, []);
