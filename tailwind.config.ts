@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-const colors = require("tailwindcss/colors");
 
 const config: Config = {
   content: [
@@ -8,20 +7,17 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   safelist: [{ pattern: /grid-cols-./ }],
-  darkMode: "class",
+  darkMode: "class", // required for @next-themes
   theme: {
-    colors: {
-      transparent: "transparent",
-      current: "currentColor",
-      black: colors.black,
-      white: colors.white,
-      gray: colors.gray,
-      emerald: colors.emerald,
-      indigo: colors.indigo,
-      yellow: colors.yellow,
-      blue: colors.blue,
+    extend: {
+      gridTemplateColumns: {
+        "12": "repeat(12, 1fr)",
+        "11": "repeat(11, 1fr)",
+        "10": "repeat(10, 1fr)",
+        "9": "repeat(9, 1fr)",
+        "8": "repeat(8, 1fr)",
+      },
     },
   },
-  plugins: [],
 };
 export default config;

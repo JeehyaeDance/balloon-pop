@@ -1,32 +1,10 @@
-export type Board = {
-  hasBalloon: number;
-}[];
+import { Board, HighScores } from "@/reducers/boardReducer";
 
-export type HighScores = {
-  index: number;
-  score: number;
-}[];
-
-export enum GameStatus {
-  WAITING,
-  PLAYING,
-  FAIL,
-  SUCCESS,
-}
-
-export const getInitialGameState = (boardSize: number) => {
-  return {
-    boardSize,
-    board: new Array(boardSize * boardSize).fill({ hasBalloon: 0 }),
-    highScores: [],
-    gameStatus: GameStatus.WAITING,
-  };
-};
 export const generateBoard = (boardSize: number) => {
   let board = [];
   // generate board with random ballon placement: 0 (empty) or 1 (balloon)
   for (let i = 0; i < boardSize * boardSize; i++) {
-    board.push({ hasBalloon: Math.round(Math.random()) });
+    board.push(Math.round(Math.random()));
   }
 
   return board;
@@ -43,7 +21,7 @@ export const countScore = (index: number, board: Board, boardSize: number) => {
 
     visited[index] = true;
 
-    if (!board[index].hasBalloon) {
+    if (!board[index]) {
       return 0;
     }
 
@@ -71,7 +49,7 @@ export const countScore = (index: number, board: Board, boardSize: number) => {
 export const generateHighScores = (board: Board, boardSize: number) => {
   let highScores: HighScores = [];
   board.forEach((square, index) => {
-    if (square.hasBalloon) {
+    if (square) {
       highScores.push({
         index: index,
         score: countScore(index, board, boardSize),
@@ -82,7 +60,7 @@ export const generateHighScores = (board: Board, boardSize: number) => {
   return highScores;
 };
 
-export const isValideMove = (index: number, highScores: HighScores) => {
+export const isValidMove = (index: number, highScores: HighScores) => {
   let moveValidity = false;
   let currentBalloon = highScores.find((square) => square.index === index);
   if (highScores[0].score === currentBalloon?.score) {
@@ -106,11 +84,11 @@ export const removeAdjacentBalloons = (
 
     visited[index] = true;
 
-    if (!board[index].hasBalloon) {
+    if (!board[index]) {
       return;
     }
 
-    newBoard[index].hasBalloon = 0;
+    newBoard[index] = 0;
 
     if (index >= boardSize) {
       removeBalloons(index - boardSize); // top

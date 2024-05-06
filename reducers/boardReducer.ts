@@ -1,17 +1,24 @@
-import { useEffect, useReducer } from "react";
 import {
-  Board,
-  GameStatus,
-  HighScores,
   generateBoard,
   generateHighScores,
-  getInitialGameState,
   removeAdjacentBalloons,
-} from "./board";
+} from "@/utils/gameLogic";
+import { db } from "@/utils/localstorage";
+export type Board = number[];
 
-const localStorageKey = "ballooonGame";
+export type HighScores = {
+  index: number;
+  score: number;
+}[];
 
-interface GameState {
+export enum GameStatus {
+  WAITING,
+  PLAYING,
+  FAIL,
+  SUCCESS,
+}
+
+export interface GameState {
   board: Board;
   boardSize: number;
   highScores: HighScores;
@@ -24,13 +31,23 @@ type ActionType =
   | { type: "POP_BALLOON"; index: number }
   | { type: "UPDATE_HIGH_SCORE" }
   | { type: "GET_SAVED_GAME"; game: GameState }
-  | { type: "CHAGE_BOARD_SIZE"; newBoardSize: number };
+  | { type: "CHANGE_BOARD_SIZE"; newBoardSize: number };
 
-const initializer = (initialValue: GameState) => {
-  const value = window.localStorage.getItem(localStorageKey);
+export const getInitialGameState = (boardSize: number) => {
+  return {
+    boardSize,
+    board: new Array(boardSize * boardSize).fill(0),
+    highScores: [],
+    gameStatus: GameStatus.WAITING,
+  };
+};
+
+export const initializer = (initialValue: GameState) => {
+  const value = db.get();
   return value ? JSON.parse(value) : initialValue;
 };
-function reducer(state: GameState, action: ActionType) {
+
+export function reducer(state: GameState, action: ActionType): GameState {
   switch (action.type) {
     case "START_GAME":
       return {
@@ -62,21 +79,9 @@ function reducer(state: GameState, action: ActionType) {
       return {
         ...action.game,
       };
-    case "CHAGE_BOARD_SIZE":
+    case "CHANGE_BOARD_SIZE":
       return getInitialGameState(action.newBoardSize);
     default:
       return getInitialGameState(6);
   }
-}
-
-export default function useLocalStorage(
-  initialValue: GameState = getInitialGameState(6)
-) {
-  const [gameState, dispatch] = useReducer(reducer, initialValue, initializer);
-
-  useEffect(() => {
-    window.localStorage.setItem(localStorageKey, JSON.stringify(gameState));
-  }, [gameState]);
-
-  return [gameState, dispatch] as const;
 }
